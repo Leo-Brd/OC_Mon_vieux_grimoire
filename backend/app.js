@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const Book = require('./models/bookModel/Book');
 
 const app = express();
 
@@ -14,8 +15,15 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res) => {
-    res.json({ message: 'Votre requête a bien été recue !'})
-})
+app.post('/api/books', (req, res, next) => {
+  delete req.body._id;
+  const book = new Book({
+    ...req.body
+  });
+  book.save()
+    .then(() => res.status(201).json({ message: 'Livre enregistré !'}))
+    .catch(error => res.status(400).json({ error }));
+  next();
+});
 
 module.exports = app;
