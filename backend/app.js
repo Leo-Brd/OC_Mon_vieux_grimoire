@@ -47,4 +47,10 @@ app.put('/api/books/:id', (req, res, next) => {
   next();
 });
 
+app.delete('/api/books/:id', (req, res, next) => {
+  Book.deleteOne({ _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Livre supprimé !'}))
+    .catch(error => res.status(400).json({ error }));
+});
+
 module.exports = app;
