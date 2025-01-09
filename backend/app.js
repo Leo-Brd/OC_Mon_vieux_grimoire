@@ -40,4 +40,11 @@ app.get('/api/books/:id', (req, res, next) => {
   next();
 });
 
+app.put('/api/books/:id', (req, res, next) => {
+  Book.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Livre modifié !'}))
+    .catch(error => res.status(400).json({ error }));
+  next();
+});
+
 module.exports = app;
