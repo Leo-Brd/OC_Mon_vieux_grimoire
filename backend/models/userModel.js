@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -19,10 +20,6 @@ const userSchema = new Schema({
   timestamps: true,
 });
 
-// To verify that the email is unique
-userSchema.path('email').validate(async function (value) {
-  const count = await mongoose.models.User.countDocuments({ email: value });
-  return count === 0;
-}, 'Email already exists');
+userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('User', userSchema);
