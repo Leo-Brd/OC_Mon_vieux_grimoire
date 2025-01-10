@@ -19,4 +19,10 @@ const userSchema = new Schema({
   timestamps: true,
 });
 
+// To verify that the email is unique
+userSchema.path('email').validate(async function (value) {
+  const count = await mongoose.models.User.countDocuments({ email: value });
+  return count === 0;
+}, 'Email already exists');
+
 module.exports = mongoose.model('User', userSchema);
