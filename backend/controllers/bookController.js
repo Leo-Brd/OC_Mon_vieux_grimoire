@@ -1,14 +1,27 @@
 const Book = require('../models/bookModel');
 
 exports.createBook = (req, res, next) => {
-    delete req.body._id;
-    const book = new Book({
-        ...req.body
-    });
-    book.save()
-        .then(() => res.status(201).json({ message: 'Livre enregistré !'}))
-        .catch(error => res.status(400).json({ error }));
+  try {
+      const bookObject = JSON.parse(req.body.book);
+
+      delete bookObject._id;
+      delete bookObject._userId;
+
+      const book = new Book({
+          ...bookObject,
+          userId: req.auth.userId,
+          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+          ratings: []
+      });
+
+      book.save()
+          .then(() => res.status(201).json({ message: 'Livre enregistré !' }))
+          .catch(error => res.status(400).json({ error }));
+  } catch (error) {
+      res.status(400).json({ error: 'Requête invalide' });
+  }
 };
+
 
 exports.getAllBooks = (req, res, next) => {
     Book.find()
