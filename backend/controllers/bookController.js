@@ -1,17 +1,28 @@
 const Book = require('../models/bookModel');
 const fs = require('fs');
+const sharp = require('sharp');
 
-exports.createBook = (req, res, next) => {
+exports.createBook = async (req, res, next) => {
   try {
       const bookObject = JSON.parse(req.body.book);
 
       delete bookObject._id;
       delete bookObject._userId;
 
+      const tempPath = req.file.path;
+      const compressedImagePath = `images/compressed_${req.file.filename}`;
+
+      await sharp(tempPath)
+          .resize(800)
+          .jpeg({ quality: 70 })
+          .toFile(compressedImagePath);
+
+      fs.unlinkSync(tempPath);
+
       const book = new Book({
           ...bookObject,
           userId: req.auth.userId,
-          imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+          imageUrl: `${req.protocol}://${req.get('host')}/${compressedImagePath}`,
           ratings: []
       });
 
