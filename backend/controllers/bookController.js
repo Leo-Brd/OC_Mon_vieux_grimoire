@@ -137,11 +137,23 @@ exports.addRating = async (req, res, next) => {
         const totalRatings = book.ratings.length;
         const sumRatings = book.ratings.reduce((sum, rating) => sum + rating.grade, 0);
         book.averageRating = sumRatings / totalRatings;
-        
+
         await book.save();
 
         res.status(201).json({ message: 'Note ajoutée avec succès !', book });
     } catch (error) {
         res.status(500).json({ error: 'Une erreur est survenue lors de l\'ajout de la note.' });
+    }
+};
+
+exports.getBestRatedBooks = async (req, res, next) => {
+    try {
+        const bestBooks = await Book.find()
+            .sort({ averageRating: -1 })
+            .limit(3);
+
+        res.status(200).json(bestBooks);
+    } catch (error) {
+        res.status(500).json({ error: 'Une erreur est survenue lors de la récupération des livres les mieux notés.' });
     }
 };
