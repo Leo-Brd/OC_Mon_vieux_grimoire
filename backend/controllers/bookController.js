@@ -2,7 +2,12 @@ const Book = require('../models/bookModel');
 const fs = require('fs');
 const sharp = require('sharp');
 
+
 async function compressImg(req) {
+    if (!req.file) {
+        throw new Error('Aucun fichier trouvé dans la requête.');
+    }
+
     const tempPath = req.file.path;
     const compressedImagePath = `images/compressed_${req.file.filename}`;
 
@@ -17,12 +22,19 @@ async function compressImg(req) {
 
 exports.createBook = async (req, res, next) => {
     try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'Aucun fichier trouvé dans la requête.' });
+        }
+        console.log('Fichier reçu :', req.file);
+        console.log('Données du livre :', req.body.book);
+
+
         const bookObject = JSON.parse(req.body.book);
 
         delete bookObject._id;
         delete bookObject._userId;
 
-        let compressedImagePath = await compressImg(req);
+        const compressedImagePath = await compressImg(req);
 
         const book = new Book({
             ...bookObject,
@@ -31,13 +43,14 @@ exports.createBook = async (req, res, next) => {
             ratings: []
         });
 
-        book.save()
-            .then(() => res.status(201).json({ message: 'Livre enregistré !' }))
-            .catch(error => res.status(400).json({ error }));
+        await book.save();
+        res.status(201).json({ message: 'Livre enregistré !' });
     } catch (error) {
-        res.status(400).json({ error: 'Requête invalide' });
+        console.error('Erreur lors de la création du livre :', error);
+        res.status(500).json({ error: 'Erreur interne du serveur' });
     }
 };
+
 
 
 exports.getAllBooks = (req, res, next) => {
