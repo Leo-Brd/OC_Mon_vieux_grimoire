@@ -16,7 +16,11 @@ async function compressImg(req) {
         .jpeg({ quality: 70 })
         .toFile(compressedImagePath);
 
-    fs.unlinkSync(tempPath);
+    fs.unlink(tempPath, (err) => {
+        if (err) {
+            console.error('Erreur lors de la suppression du fichier temporaire:', err);
+        }
+    });
     return compressedImagePath;
 }
 
