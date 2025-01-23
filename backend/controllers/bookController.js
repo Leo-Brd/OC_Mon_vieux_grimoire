@@ -8,13 +8,22 @@ async function compressImg(req) {
         throw new Error('Aucun fichier trouvé dans la requête.');
     }
 
-    const tempPath = req.file.path;
+    const tempPath = `images/${req.file.filename}`;
     const compressedImagePath = `images/compressed_${req.file.filename}`;
 
     await sharp(tempPath)
         .resize(800)
         .jpeg({ quality: 70 })
         .toFile(compressedImagePath);
+
+    fs.access(tempPath, (err) => {
+        if (err) {
+            console.error('Erreur lors de la suppression du fichier temporaire:', err);
+        } else {
+            console.log("ok");
+        }
+    })
+
 
     fs.unlink(tempPath, (err) => {
         if (err) {
@@ -29,9 +38,6 @@ exports.createBook = async (req, res, next) => {
         if (!req.file) {
             return res.status(400).json({ error: 'Aucun fichier trouvé dans la requête.' });
         }
-        console.log('Fichier reçu :', req.file);
-        console.log('Données du livre :', req.body.book);
-
 
         const bookObject = JSON.parse(req.body.book);
 
@@ -54,7 +60,6 @@ exports.createBook = async (req, res, next) => {
         res.status(500).json({ error: 'Erreur interne du serveur' });
     }
 };
-
 
 
 exports.getAllBooks = (req, res, next) => {
@@ -132,9 +137,9 @@ exports.deleteBook = (req, res, next) => {
 
 exports.addRating = async (req, res, next) => {
     try {
-        const { userId, grade } = req.body;
+        const { userId, rating } = req.body;
 
-        if (grade < 0 || grade > 5) {
+        if (rating < 0 || rating > 5) {
             return res.status(400).json({ message: 'La note doit être comprise entre 0 et 5.' });
         }
 
@@ -149,11 +154,12 @@ exports.addRating = async (req, res, next) => {
             return res.status(400).json({ message: 'Vous avez déjà noté ce livre.' });
         }
 
-        book.ratings.push({ userId, grade });
+        book.ratings.push({ userId, grade: rating });
 
         const totalRatings = book.ratings.length;
         const sumRatings = book.ratings.reduce((sum, rating) => sum + rating.grade, 0);
         book.averageRating = sumRatings / totalRatings;
+        console.log(book);
 
         await book.save();
 
@@ -168,6 +174,11 @@ exports.getBestRatedBooks = async (req, res, next) => {
         const bestBooks = await Book.find()
             .sort({ averageRating: -1 })
             .limit(3);
+
+        if (bestBooks.length === 0) {
+            return res.status(404).json({ message: 'Aucun livre trouvé.' });
+        }
+        console.log(bestBooks);
 
         res.status(200).json(bestBooks);
     } catch (error) {
