@@ -159,7 +159,6 @@ exports.addRating = async (req, res, next) => {
         const totalRatings = book.ratings.length;
         const sumRatings = book.ratings.reduce((sum, rating) => sum + rating.grade, 0);
         book.averageRating = sumRatings / totalRatings;
-        console.log(book);
 
         await book.save();
 
@@ -178,7 +177,6 @@ exports.getBestRatedBooks = async (req, res, next) => {
         if (bestBooks.length === 0) {
             return res.status(404).json({ message: 'Aucun livre trouvé.' });
         }
-        console.log(bestBooks);
 
         res.status(200).json(bestBooks);
     } catch (error) {
