@@ -1,37 +1,5 @@
 const Book = require('../models/bookModel');
 const fs = require('fs');
-const sharp = require('sharp');
-
-
-async function compressImg(req) {
-    if (!req.file) {
-        throw new Error('Aucun fichier trouvé dans la requête.');
-    }
-
-    const tempPath = `images/${req.file.filename}`;
-    const compressedImagePath = `images/compressed_${req.file.filename}`;
-
-    await sharp(tempPath)
-        .resize(800)
-        .jpeg({ quality: 70 })
-        .toFile(compressedImagePath);
-
-    fs.access(tempPath, (err) => {
-        if (err) {
-            console.error('Erreur lors de la suppression du fichier temporaire:', err);
-        } else {
-            console.log("ok");
-        }
-    })
-
-
-    fs.unlink(tempPath, (err) => {
-        if (err) {
-            console.error('Erreur lors de la suppression du fichier temporaire:', err);
-        }
-    });
-    return compressedImagePath;
-}
 
 exports.createBook = async (req, res, next) => {
     try {
@@ -44,12 +12,12 @@ exports.createBook = async (req, res, next) => {
         delete bookObject._id;
         delete bookObject._userId;
 
-        const compressedImagePath = await compressImg(req);
+        req.file.path = req.file.path.split('/images/')[1];
 
         const book = new Book({
             ...bookObject,
             userId: req.auth.userId,
-            imageUrl: `${req.protocol}://${req.get('host')}/${compressedImagePath}`,
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
             ratings: []
         });
 
@@ -79,11 +47,10 @@ exports.modifyBook = async (req, res, next) => {
         let bookObject;
 
         if (req.file) {
-            let compressedImagePath = await compressImg(req);
 
             bookObject = {
                 ...JSON.parse(req.body.book),
-                imageUrl: `${req.protocol}://${req.get('host')}/${compressedImagePath}`,
+                imageUrl: `${req.protocol}://${req.get('host')}/${req.file.filename}`,
             };
         } else {
             bookObject = { ...req.body };
