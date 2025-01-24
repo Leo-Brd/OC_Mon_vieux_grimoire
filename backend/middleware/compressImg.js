@@ -2,6 +2,8 @@ const sharp = require('sharp');
 const fs = require('fs/promises');
 const path = require('path');
 
+// This middleware compress the image and put it in the images folder
+
 module.exports = async (req, res, next) => {
     try {
         if (!req.file) {

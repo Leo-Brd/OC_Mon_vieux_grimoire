@@ -1,6 +1,8 @@
 const fs = require('fs/promises');
 const path = require('path');
 
+// This middleware clear the temp folder
+
 const clearTempFolder = async (req, res, next) => {
     try {
         const tempFolder = path.join(__dirname, '../temp');

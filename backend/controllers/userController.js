@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 // ALL THE FUNCTIONS FOR THE USERS
 
+// We create a new user with a hashed password
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
@@ -18,6 +19,7 @@ exports.signup = (req, res, next) => {
         .catch(error => res.status(500).json({ error}));
 };
 
+// We check the user's credentials and send back a token
 exports.login = (req, res, next) => {
     User.findOne({ email: req.body.email })
         .then(user => {

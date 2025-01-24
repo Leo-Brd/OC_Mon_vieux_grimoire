@@ -3,18 +3,21 @@ const fs = require('fs');
 
 // ALL THE FUNCTIONS FOR THE BOOKS
 
+// We get all the books
 exports.getAllBooks = (req, res, next) => {
     Book.find()
       .then(books => res.status(200).json(books))
       .catch(error => res.status(400).json({ error }));
 };
 
+// We get one specific book
 exports.getOneBook = (req, res, next) => {
     Book.findOne({ _id: req.params.id })
       .then(book => res.status(200).json(book))
       .catch(error => res.status(404).json({ error }));
 };
 
+// We create a new book
 exports.createBook = async (req, res, next) => {
     try {
         if (!req.file) {
@@ -42,7 +45,7 @@ exports.createBook = async (req, res, next) => {
     }
 };
 
-
+// We modify a book and manage the new image if there is one
 exports.modifyBook = async (req, res, next) => {
     try {
         let bookObject;
@@ -87,6 +90,7 @@ exports.modifyBook = async (req, res, next) => {
   
 };
 
+// We delete a book
 exports.deleteBook = (req, res, next) => {
     Book.findOne({ _id: req.params.id})
         .then(book => {
@@ -109,6 +113,7 @@ exports.deleteBook = (req, res, next) => {
         });
 };
 
+// We add a valid rating to a book and calculate the new average rating
 exports.addRating = async (req, res, next) => {
     try {
         const { userId, rating } = req.body;
@@ -142,6 +147,7 @@ exports.addRating = async (req, res, next) => {
     }
 };
 
+// We get the 3 best rated books
 exports.getBestRatedBooks = async (req, res, next) => {
     try {
         const bestBooks = await Book.find()
