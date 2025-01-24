@@ -12,8 +12,6 @@ exports.createBook = async (req, res, next) => {
         delete bookObject._id;
         delete bookObject._userId;
 
-        req.file.path = req.file.path.split('/images/')[1];
-
         const book = new Book({
             ...bookObject,
             userId: req.auth.userId,
@@ -50,7 +48,7 @@ exports.modifyBook = async (req, res, next) => {
 
             bookObject = {
                 ...JSON.parse(req.body.book),
-                imageUrl: `${req.protocol}://${req.get('host')}/${req.file.filename}`,
+                imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
             };
         } else {
             bookObject = { ...req.body };

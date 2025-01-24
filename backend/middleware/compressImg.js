@@ -1,16 +1,17 @@
 const sharp = require('sharp');
-const fs = require('fs');
+const fs = require('fs/promises');
 const path = require('path');
 
 module.exports = async (req, res, next) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ error: 'Aucun fichier trouvé dans la requête.' });
+            console.error('Aucun fichier trouvé dans la requête.');
+            return next();
         }
 
         const tempPath = req.file.path;
         const compressedImagePath = path.join(
-            path.dirname(tempPath),
+            path.dirname(tempPath).replace('temp', 'images'),
             `compressed_${req.file.filename}`
         );
 
@@ -19,11 +20,6 @@ module.exports = async (req, res, next) => {
             .jpeg({ quality: 70 })
             .toFile(compressedImagePath);
 
-        fs.unlink(tempPath, (err) => {
-            if (err) {
-                console.error('Erreur lors de la suppression du fichier temporaire:', err);
-            }
-        });
 
         req.file.path = compressedImagePath;
         req.file.filename = `compressed_${req.file.filename}`;

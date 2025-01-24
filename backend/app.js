@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const bookRoutes = require('./routes/bookRoutes');
 const userRoutes = require('./routes/userRoutes');
+const clearTempFolder = require('./middleware/clearTempFolder');
 
 const app = express();
 
@@ -23,5 +24,7 @@ app.use(bodyParser.json());
 app.use('/api/books', bookRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
+app.use(clearTempFolder);
 
 module.exports = app;
