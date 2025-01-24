@@ -1,6 +1,20 @@
 const Book = require('../models/bookModel');
 const fs = require('fs');
 
+// ALL THE FUNCTIONS FOR THE BOOKS
+
+exports.getAllBooks = (req, res, next) => {
+    Book.find()
+      .then(books => res.status(200).json(books))
+      .catch(error => res.status(400).json({ error }));
+};
+
+exports.getOneBook = (req, res, next) => {
+    Book.findOne({ _id: req.params.id })
+      .then(book => res.status(200).json(book))
+      .catch(error => res.status(404).json({ error }));
+};
+
 exports.createBook = async (req, res, next) => {
     try {
         if (!req.file) {
@@ -21,24 +35,13 @@ exports.createBook = async (req, res, next) => {
 
         await book.save();
         res.status(201).json({ message: 'Livre enregistré !' });
+        next();
     } catch (error) {
         console.error('Erreur lors de la création du livre :', error);
         res.status(500).json({ error: 'Erreur interne du serveur' });
     }
 };
 
-
-exports.getAllBooks = (req, res, next) => {
-    Book.find()
-      .then(books => res.status(200).json(books))
-      .catch(error => res.status(400).json({ error }));
-};
-
-exports.getOneBook = (req, res, next) => {
-    Book.findOne({ _id: req.params.id })
-      .then(book => res.status(200).json(book))
-      .catch(error => res.status(404).json({ error }));
-};
 
 exports.modifyBook = async (req, res, next) => {
     try {
@@ -68,7 +71,10 @@ exports.modifyBook = async (req, res, next) => {
                     }
 
                     Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
-                    .then(() => res.status(200).json({message : 'Livre modifié!'}))
+                    .then(() => {
+                        res.status(200).json({message : 'Livre modifié!'});
+                        next();
+                    })
                     .catch(error => res.status(401).json({ error }));
                 }
             })
@@ -90,7 +96,10 @@ exports.deleteBook = (req, res, next) => {
                 const filename = book.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     Book.deleteOne({_id: req.params.id})
-                        .then(() => { res.status(200).json({message: 'Livre supprimé !'})})
+                        .then(() => {
+                            res.status(200).json({message: 'Livre supprimé !'});
+                            next();
+                        })
                         .catch(error => res.status(401).json({ error }));
                 });
             }

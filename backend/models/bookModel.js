@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+// This is the schema of the book model
 const bookSchema = new Schema({
   userId: {
     type: String,

@@ -5,7 +5,6 @@ const path = require('path');
 module.exports = async (req, res, next) => {
     try {
         if (!req.file) {
-            console.error('Aucun fichier trouvé dans la requête.');
             return next();
         }
 

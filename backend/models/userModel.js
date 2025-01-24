@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const { Schema } = mongoose;
 
+// This is the schema of the user model
 const userSchema = new Schema({
   email: {
     type: String,

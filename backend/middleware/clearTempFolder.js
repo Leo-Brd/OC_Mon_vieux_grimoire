@@ -7,12 +7,15 @@ const clearTempFolder = async (req, res, next) => {
 
         const files = await fs.readdir(tempFolder);
 
+        if (files.length === 0) {
+            return next();
+        }
+
         for (const file of files) {
             const filePath = path.join(tempFolder, file);
             await fs.unlink(filePath);
         }
 
-        console.log('Dossier temp vidé avec succès.');
         next();
     } catch (error) {
         console.error('Erreur lors du nettoyage du dossier temp:', error);
