@@ -28,6 +28,6 @@ module.exports = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Erreur lors de la compression de l\'image:', error);
-        res.status(500).json({ error: 'Erreur lors de la compression de l\'image.' });
+        res.status(500).json({ error });
     }
 };
