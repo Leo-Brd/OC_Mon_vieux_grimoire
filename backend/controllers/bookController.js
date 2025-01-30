@@ -139,6 +139,10 @@ exports.addRating = async (req, res, next) => {
             return res.status(404).json({ message: 'Livre non trouvé.' });
         }
 
+        if (book.userId.toString() === userId) {
+            return res.status(400).json({ message: 'Vous ne pouvez pas noter votre propre livre.' });
+        }
+
         const existingRating = book.ratings.find(rating => rating.userId === userId);
         if (existingRating) {
             return res.status(400).json({ message: 'Vous avez déjà noté ce livre.' });
