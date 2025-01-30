@@ -11,19 +11,15 @@ module.exports = async (req, res, next) => {
         }
 
         const tempPath = req.file.path;
-        const compressedImagePath = path.join(
-            path.dirname(tempPath).replace('temp', 'images'),
-            `compressed_${req.file.filename}`
-        );
+        const tempDir = path.dirname(tempPath);
+        const compressedPath = path.join(tempDir, `compressed_${req.file.filename}`);
 
         await sharp(tempPath)
             .resize(800)
             .jpeg({ quality: 70 })
-            .toFile(compressedImagePath);
+            .toFile(compressedPath);
 
-
-        req.file.path = compressedImagePath;
-        req.file.filename = `compressed_${req.file.filename}`;
+        await fs.rename(compressedPath, tempPath);
 
         next();
     } catch (error) {
