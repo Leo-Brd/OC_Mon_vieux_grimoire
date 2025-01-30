@@ -12,8 +12,11 @@ exports.getAllBooks = (req, res, next) => {
 
 // We get one specific book
 exports.getOneBook = (req, res, next) => {
+    console.log("ID reçu dans GET:", req.params.id);
+
     Book.findOne({ _id: req.params.id })
       .then(book => {
+        console.log("Livre trouvé:", book);
         if (!book) {
           return res.status(404).json({ error: 'Livre non trouvé.' });
         }
@@ -40,8 +43,7 @@ exports.createBook = async (req, res, next) => {
         const book = new Book({
             ...bookObject,
             userId: req.auth.userId,
-            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-            ratings: []
+            imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         });
 
         await book.save();
@@ -68,6 +70,7 @@ exports.modifyBook = async (req, res, next) => {
         }
       
         delete bookObject._userId;
+
 
         Book.findOne({_id: req.params.id})
             .then((book) => {
@@ -143,7 +146,7 @@ exports.addRating = async (req, res, next) => {
             return res.status(400).json({ message: 'Vous ne pouvez pas noter votre propre livre.' });
         }
 
-        const existingRating = book.ratings.find(rating => rating.userId === userId);
+        const existingRating = book.ratings.find(rating => rating.userId.toString() === userId);
         if (existingRating) {
             return res.status(400).json({ message: 'Vous avez déjà noté ce livre.' });
         }
@@ -156,7 +159,7 @@ exports.addRating = async (req, res, next) => {
 
         await book.save();
 
-        res.status(201).json({ message: 'Note ajoutée avec succès !', book });
+        res.status(201).json( book );
     } catch (error) {
         res.status(500).json({ error });
     }

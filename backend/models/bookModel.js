@@ -40,17 +40,12 @@ const bookSchema = new Schema({
       },
       grade: {
         type: Number,
-        required: [true, 'La note est obligatoire'],
-        min: [0, 'La note doit être au moins 0'],
-        max: [5, 'La note ne peut pas dépasser 5'],
+        required: [true, 'La note est obligatoire']
       },
     },
   ],
   averageRating: {
-    type: Number,
-    default: 0,
-    min: [0, 'La note moyenne doit être au moins 0'],
-    max: [5, 'La note moyenne ne peut pas dépasser 5'],
+    type: Number
   },
 }, {
   timestamps: true,
