@@ -2,7 +2,7 @@ const sharp = require('sharp');
 const fs = require('fs/promises');
 const path = require('path');
 
-// This middleware compress the image and put it in the images folder
+// This middleware compress the image and replace the original one
 
 module.exports = async (req, res, next) => {
     try {
@@ -23,7 +23,6 @@ module.exports = async (req, res, next) => {
 
         next();
     } catch (error) {
-        console.error('Erreur lors de la compression de l\'image:', error);
         res.status(500).json({ error });
     }
 };

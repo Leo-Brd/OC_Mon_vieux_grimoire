@@ -1,7 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 
-// This middleware download an image file and save it in the temp folder
+// This middleware download an image file and save it in the image folder
 
 const MIME_TYPES = {
     'image/jpg': 'jpg',

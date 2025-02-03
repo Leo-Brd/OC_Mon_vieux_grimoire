@@ -12,11 +12,8 @@ exports.getAllBooks = (req, res, next) => {
 
 // We get one specific book
 exports.getOneBook = (req, res, next) => {
-    console.log("ID reçu dans GET:", req.params.id);
-
     Book.findOne({ _id: req.params.id })
       .then(book => {
-        console.log("Livre trouvé:", book);
         if (!book) {
           return res.status(404).json({ error: 'Livre non trouvé.' });
         }
@@ -71,7 +68,6 @@ exports.modifyBook = async (req, res, next) => {
       
         delete bookObject._userId;
 
-
         Book.findOne({_id: req.params.id})
             .then((book) => {
                 if (book.userId != req.auth.userId) {
@@ -80,7 +76,7 @@ exports.modifyBook = async (req, res, next) => {
                     if (req.file && book.imageUrl) {
                         const oldFilename = book.imageUrl.split('/images/')[1];
                         fs.unlink(`images/${oldFilename}`, (err) => {
-                          if (err) res.status(500).json({ error: 'Une erreur est survenue lors de la suppression de l\'image.'});
+                          if (err) res.status(500).json({ error: err});
                         });
                     }
 
